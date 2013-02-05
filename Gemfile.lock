@@ -4,11 +4,11 @@ GIT
   specs:
     rspec-core (2.12.2)
 
-GIT
-  remote: git://github.com/sleepingkingstudios/mithril.git
-  revision: d9be4229503b813434ed92549c10cef17ad305cd
+PATH
+  remote: ../truesilver
   specs:
-    mithril (0.1.1)
+    mithril (0.2.0)
+    mithril-specs (0.2.0)
 
 GEM
   remote: https://rubygems.org/
@@ -87,7 +87,8 @@ DEPENDENCIES
   factory_girl
   haml
   json
-  mithril!
+  mithril (~> 0.2.0)!
+  mithril-specs!
   mongo_mapper
   rake
   rspec

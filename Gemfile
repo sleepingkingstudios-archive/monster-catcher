@@ -6,7 +6,10 @@ gem 'sinatra-contrib'
 gem 'rake'
 
 # Mithril
-gem 'mithril', :git => 'git://github.com/sleepingkingstudios/mithril.git'
+path '../truesilver' do
+  gem 'mithril', '~> 0.2.0'
+  gem 'mithril-specs', :group => :test
+end # path
 
 # Assets
 gem 'json'
