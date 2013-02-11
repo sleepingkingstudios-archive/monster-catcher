@@ -128,4 +128,95 @@ describe MonsterCatcher::Controllers::UserController do
       end # context
     end # context
   end # describe
+  
+  describe "login action" do
+    let :username do FactoryGirl.generate :user_name; end
+    let :password do FactoryGirl.generate :user_password; end
+    
+    specify { expect(instance).to have_action :login }
+    specify { expect(instance).to have_command "login" }
+    specify { expect(instance.can_invoke? "login #{username} #{password}").to be true }
+    
+    context 'with "help"' do
+      let :text do "login help"; end
+      
+      specify { expect(instance.invoke_command text).
+        to match /the login command/i }
+    end # context
+    
+    context 'with no arguments' do
+      let :text do "login"; end
+      
+      specify { expect(instance.invoke_command text).
+        to match /requires a username and password/i }
+    end # context
+    
+    context 'with one argument' do
+      let :text do "login #{username}"; end
+      
+      specify { expect(instance.invoke_command text).
+        to match /requires a username and password/i }
+    end # context
+    
+    context 'with an invalid username' do
+      let :text do "login #{username} #{password}"; end
+      
+      specify { expect(instance.invoke_command text).
+        to match /unable to authenticate user/i }
+    end # context
+    
+    context 'with a user defined' do
+      before :each do
+        FactoryGirl.create :user, :name => username, :password => password
+      end # before each
+      
+      context 'with "help"' do
+        let :text do "login help"; end
+
+        specify { expect(instance.invoke_command text).
+          to match /the login command/i }
+      end # context
+
+      context 'with no arguments' do
+        let :text do "login"; end
+
+        specify { expect(instance.invoke_command text).
+          to match /requires a username and password/i }
+      end # context
+
+      context 'with one argument' do
+        let :text do "login #{username}"; end
+
+        specify { expect(instance.invoke_command text).
+          to match /requires a username and password/i }
+      end # context
+
+      context 'with an invalid username' do
+        let :text do "login #{FactoryGirl.generate :user_name} #{password}"; end
+
+        specify { expect(instance.invoke_command text).
+          to match /unable to authenticate user/i }
+      end # context
+
+      context 'with an invalid password' do
+        let :text do "login #{username} #{FactoryGirl.generate :user_password}"; end
+
+        specify { expect(instance.invoke_command text).
+          to match /unable to authenticate user/i }
+      end # context
+      
+      context 'with a valid username and password' do
+        let :text do "login #{username} #{password}"; end
+        
+        specify { expect(instance.invoke_command text).
+          to match /now logged in as #{username}/i }
+        
+        specify 'updates the session with the new user\'s id' do
+          instance.invoke_command text
+          user = MonsterCatcher::Models::User.where(:name => username).first
+          expect(request.session[:user_id]).to eq user.id
+        end # specify
+      end # context
+    end # context
+  end # describe
 end # describe

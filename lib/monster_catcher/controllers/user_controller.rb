@@ -44,6 +44,30 @@ module MonsterCatcher::Controllers
       
       "Your user account has been created. You are now logged in as" +
         " #{username}."
-    end # action
+    end # action register
+    
+    define_action :login do |session, arguments|
+      if arguments.first =~ /help/
+        return "The login command starts a new user session. You must be" +
+          " logged in to start or continue a game.\n\nFormat: \"login" +
+          " USERNAME PASSWORD\"."
+      elsif 2 > arguments.count
+        return "The login command requires a username and password. For" +
+          " more information, enter \"register help\"."
+      end # if-else
+      
+      username = arguments.shift
+      password = arguments.shift
+      
+      user = User.where(:name => username).first
+      
+      if user.nil? || !user.authenticate(password)
+        return "Unable to authenticate user \"#{username}\"."
+      end # if
+      
+      session[:user_id] = user.id
+      
+      "You are now logged in as #{username}."
+    end # action login
   end # class
 end # module
