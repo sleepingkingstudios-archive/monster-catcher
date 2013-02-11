@@ -17,6 +17,10 @@ module MonsterCatcher
     configure :development do
       require 'sinatra/reloader'
       register Sinatra::Reloader
+      
+      require 'yaml'
+      config = YAML::load File.read File.join File.dirname(__FILE__), 'config', 'database.yml'
+      MongoMapper.setup(config, environment)
     end # configure
     
     #=# Assets #=#

@@ -18,8 +18,9 @@ gem 'sass'
 gem 'coffee-script'
 
 # Data Mapping
-gem 'mongo_mapper'
+gem 'mongoid'
 gem 'bson_ext'
+gem 'bcrypt-ruby', '~> 3.0.0'
 
 # Testing
 group :test do
