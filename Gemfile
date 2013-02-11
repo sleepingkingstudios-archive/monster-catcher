@@ -27,4 +27,5 @@ group :test do
   gem 'rspec-core', :git => 'git://github.com/rspec/rspec-core.git'
   gem 'rspec'
   gem 'factory_girl'
+  gem 'database_cleaner'
 end # group test

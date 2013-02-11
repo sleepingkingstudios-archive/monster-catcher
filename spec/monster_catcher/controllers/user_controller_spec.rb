@@ -14,8 +14,6 @@ describe MonsterCatcher::Controllers::UserController do
   it_behaves_like Mithril::Controllers::AbstractController
   it_behaves_like Mithril::Controllers::Mixins::HelpActions
   
-  after :each do MonsterCatcher::Models::User.destroy_all; end
-  
   describe :allow_registration? do
     specify { expect(instance).to respond_to(:allow_registration?).with(0).arguments }
   end # describe
