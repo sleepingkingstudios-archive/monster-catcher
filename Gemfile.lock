@@ -7,8 +7,8 @@ GIT
 PATH
   remote: ../truesilver
   specs:
-    mithril (0.3.0)
-    mithril-specs (0.3.0)
+    mithril (0.3.4)
+    mithril-specs (0.3.4)
 
 GEM
   remote: https://rubygems.org/

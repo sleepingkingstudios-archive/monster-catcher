@@ -4,6 +4,7 @@ require 'monster_catcher/spec_helper'
 require 'mithril/controllers/abstract_controller_helper'
 require 'mithril/controllers/mixins/callback_helpers_helper'
 require 'mithril/controllers/mixins/help_actions_helper'
+require 'monster_catcher/controllers/mixins/user_helpers_helper'
 
 require 'monster_catcher/controllers/character_controller'
 
@@ -15,28 +16,7 @@ describe MonsterCatcher::Controllers::CharacterController do
   it_behaves_like Mithril::Controllers::AbstractController
   it_behaves_like Mithril::Controllers::Mixins::CallbackHelpers
   it_behaves_like Mithril::Controllers::Mixins::HelpActions
-  
-  describe :current_user do
-    specify { expect(instance).to respond_to(:current_user).with(0).arguments }
-    
-    specify { expect(instance.current_user).to be nil }
-    
-    context 'with an invalid user id' do
-      let :user do FactoryGirl.build :user; end
-      
-      before :each do request.session[:user_id] = user.id; end
-      
-      specify { expect(instance.current_user).to be nil }
-    end # context
-    
-    context 'with a valid user id' do
-      let :user do FactoryGirl.create :user; end
-      
-      before :each do request.session[:user_id] = user.id; end
-      
-      specify { expect(instance.current_user).to eq user }
-    end # context
-  end # describe
+  it_behaves_like MonsterCatcher::Controllers::Mixins::UserHelpers
   
   describe "new game action" do
     specify { expect(instance).to have_action :new_game }
@@ -53,7 +33,7 @@ describe MonsterCatcher::Controllers::CharacterController do
     
     context 'with no arguments' do
       let :text do "new game"; end
-      let :callbacks do { "name" => "CharacterController,_char_name" }; end
+      let :callbacks do { "" => "CharacterController,_char_name" }; end
       
       specify { expect(instance.invoke_command text).
         to match /please enter the name of your character/i }
@@ -79,6 +59,9 @@ describe MonsterCatcher::Controllers::CharacterController do
     
     specify { expect(instance.invoke_action :_char_name, [name], true).
       to match /welcome to the world of monster catcher/i }
+
+    specify { expect(instance.invoke_action :_char_name, [name], true).
+      to match /#{name}/i }
     
     specify 'creates a new character for the current user' do
       instance.invoke_action :_char_name, [name], true

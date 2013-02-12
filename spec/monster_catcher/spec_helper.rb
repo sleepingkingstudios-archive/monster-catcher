@@ -11,6 +11,9 @@ root_path = File.dirname(__FILE__).gsub('spec/monster_catcher', '/')
 #=# Require Environment #=#
 require File.join root_path, "config", "environment"
 
+#=# Require Extensions #=#
+Dir[root_path + "lib/monster_catcher/extensions/**/*.rb"].each { |f| require f }
+
 #=# Connect to Datastore #=#
 require 'mongoid'
 Mongoid.load! File.join(root_path, 'config', 'mongoid.yml'), :test

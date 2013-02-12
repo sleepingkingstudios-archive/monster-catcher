@@ -4,30 +4,14 @@ require 'mithril/controllers/abstract_controller'
 require 'mithril/controllers/mixins/callback_helpers'
 require 'mithril/controllers/mixins/help_actions'
 require 'monster_catcher/controllers'
+require 'monster_catcher/controllers/mixins/user_helpers'
 require 'monster_catcher/models/user'
 
 module MonsterCatcher::Controllers
   class CharacterController < Mithril::Controllers::AbstractController
     mixin Mithril::Controllers::Mixins::CallbackHelpers
     mixin Mithril::Controllers::Mixins::HelpActions
-    
-    include MonsterCatcher::Models
-    
-    def initialize(request)
-      super
-      
-      namespaces << "MonsterCatcher::Controllers"
-    end # method initialize
-    
-    def current_user
-      return nil if (user_id = request.session[:user_id]).nil?
-      
-      begin
-        User.find user_id
-      rescue Mongoid::Errors::DocumentNotFound
-        nil
-      end # begin-rescue
-    end # method current_user
+    mixin MonsterCatcher::Controllers::Mixins::UserHelpers
     
     define_action :new_game do |session, arguments|
       if arguments.first =~ /help/i
@@ -35,7 +19,7 @@ module MonsterCatcher::Controllers
           " game of Monster Catcher."
       end # if
       
-      callbacks = { "name" => { :controller => CharacterController, :action => :_char_name } }
+      callbacks = { "" => { :controller => CharacterController, :action => :_char_name } }
       callbacks = self.serialize_callbacks callbacks
       self.set_callbacks request.session, callbacks
       
