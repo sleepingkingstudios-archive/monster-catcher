@@ -6,7 +6,7 @@ require 'monster_catcher/models/user'
 
 describe MonsterCatcher::Models::User do
   describe :constructor do
-    specify { expect(described_class).to construct.with(0).arguments }
+    specify { expect(described_class).to construct.with(0..1).arguments }
   end # describe
   
   describe "validation" do
@@ -45,7 +45,8 @@ describe MonsterCatcher::Models::User do
     end # specify
   end # describe
   
-  let :instance do FactoryGirl.build :user; end
+  let :attributes do FactoryGirl.attributes_for :user; end
+  let :instance do described_class.create attributes; end
   
   describe :name do
     specify { expect(instance).to respond_to(:name).with(0).arguments }
@@ -92,18 +93,29 @@ describe MonsterCatcher::Models::User do
     end # context
   end # describe
   
-  context "created" do
-    let :params do FactoryGirl.attributes_for :user; end
-    let :instance do described_class.create! params; end
+  describe :authentication do
+    specify "authenticates with a valid password" do
+      expect(instance.authenticate attributes[:password]).to be true
+    end # specify
     
-    describe :authentication do
-      specify "authenticates with a valid password" do
-        expect(instance.authenticate params[:password]).to be true
-      end # specify
-      
-      specify "does not authenticate with an invalid password" do
-        expect(instance.authenticate FactoryGirl.generate(:user_password)).to be false
-      end # specify
-    end # describe
-  end # context
+    specify "does not authenticate with an invalid password" do
+      expect(instance.authenticate FactoryGirl.generate(:user_password)).to be false
+    end # specify
+  end # describe
+  
+  let :character do FactoryGirl.build :character, :user => nil; end
+  
+  describe :character do
+    specify { expect(instance).to respond_to(:character).with(0).arguments }
+    specify { expect(instance.character).to be nil }
+  end # describe
+  
+  describe :character= do
+    specify { expect(instance).to respond_to(:character=).with(1).arguments }
+    
+    specify 'updates the value' do
+      instance.character = character
+      expect(instance.character).to eq character
+    end # specify
+  end # describe
 end # describe

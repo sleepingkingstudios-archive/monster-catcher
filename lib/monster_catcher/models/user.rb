@@ -3,6 +3,7 @@
 require 'bcrypt'
 
 require 'monster_catcher/models'
+require 'monster_catcher/models/character'
 
 module MonsterCatcher::Models
   class User
@@ -14,6 +15,9 @@ module MonsterCatcher::Models
     attr_accessor :password
     
     attr_accessible :name, :password
+    
+    # Relations
+    has_one :character, :class_name => "MonsterCatcher::Models::Character"
     
     # Validations
     validates_presence_of :name, :password
