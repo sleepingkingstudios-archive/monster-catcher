@@ -4,7 +4,7 @@ task :console => [:environment, :logger, :mongoid] do
   require 'irb'
   
   root_path = File.dirname(__FILE__)
-  Dir[root_path + "/lib/monster_catcher/models/*.rb"].each { |f| require f }
+  Dir[root_path + "/lib/monster_catcher/models/**/*.rb"].each { |f| require f }
   
   include MonsterCatcher::Models
   
