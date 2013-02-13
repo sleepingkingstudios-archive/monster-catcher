@@ -13,7 +13,7 @@ module MonsterCatcher::Controllers
     mixin Mithril::Controllers::Mixins::HelpActions
     
     def allow_registration?
-      false
+      true
     end # method allow_registration?
     
     define_action :register do |session, arguments|

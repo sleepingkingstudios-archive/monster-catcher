@@ -2,6 +2,8 @@
 
 module MonsterCatcher
   class App < Sinatra::Base
+    enable :sessions
+    
     set :views, :default => 'views',
       :scss => 'assets/stylesheets',
       :coffee => 'assets/scripts'
@@ -18,9 +20,7 @@ module MonsterCatcher
       require 'sinatra/reloader'
       register Sinatra::Reloader
       
-      require 'yaml'
-      config = YAML::load File.read File.join File.dirname(__FILE__), 'config', 'database.yml'
-      MongoMapper.setup(config, environment)
+      Mongoid.load! File.join(File.dirname(__FILE__), 'config', 'mongoid.yml'), environment
     end # configure
     
     #=# Assets #=#
@@ -34,7 +34,18 @@ module MonsterCatcher
     
     get "/" do
       if request.xhr?
-        { :text => request.params["text"] }.to_json
+        require 'monster_catcher/controllers/routing_controller'
+        require 'mithril/request'
+        
+        session[:monster_catcher] ||= {}
+        
+        mithril    = Mithril::Request.new session[:monster_catcher]
+        controller = MonsterCatcher::Controllers::RoutingController.new mithril
+        output     = controller.invoke_command request.params["text"]
+        
+        session[:monster_catcher] = mithril.session
+        
+        { :text => output }.to_json
       else
         haml :console
       end # if-else

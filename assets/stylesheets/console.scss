@@ -22,6 +22,10 @@ body {
     padding: 0;
   } // end #console p
   
+  a {
+    @include console-text;
+  } // end #console a
+  
   ul {
     @include console-text;
     

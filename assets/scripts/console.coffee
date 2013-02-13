@@ -4,7 +4,7 @@ jQuery(document).ready () ->
   self = jQuery this
   
   output = jQuery '#console-output'
-  output.append '<li>Greetings, program!</li>'
+  output.append '<li>Welcome to Monster Catcher Online!</li>'
   
   form  = jQuery 'form#console-input'
   input = form.find 'input#input-field'
