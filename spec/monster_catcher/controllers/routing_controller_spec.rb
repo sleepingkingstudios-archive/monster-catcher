@@ -139,11 +139,9 @@ describe MonsterCatcher::Controllers::RoutingController do
     
     specify { expect(instance.current_user).to eq user }
     
-    context 'with no character' do
-      specify { expect(instance.current_character).to be nil }
-      
-      specify { expect(instance.proxy).to be_a MonsterCatcher::Controllers::CharacterController }
-    end # context
+    specify { expect(instance.current_character).to be nil }
+    
+    specify { expect(instance.proxy).to be_a MonsterCatcher::Controllers::CharacterController }
     
     describe "starting a new game" do
       let :callbacks do { "" => "CharacterController,_char_name" }; end
@@ -186,5 +184,27 @@ describe MonsterCatcher::Controllers::RoutingController do
         end # specify
       end # context
     end # describe
+  end # context
+  
+  context 'with a character selected' do
+    let :character do FactoryGirl.create :character; end
+    let :user do
+      user = FactoryGirl.build(:user)
+      user.character = character
+      user.save
+      user
+    end # let
+    let :request do
+      super().tap { |req| req.session.update :character_id => character.id, :user_id => user.id }
+    end # let
+    
+    specify { expect(instance.current_user).to eq user }
+    
+    specify { expect(instance.current_character).to eq character }
+    
+    specify { expect(instance.proxy).to be_a MonsterCatcher::Controllers::ExploreController }
+    
+    specify { expect(instance.invoke_command "where am I").
+      to match /lost in the void between worlds/i }
   end # context
 end # describe

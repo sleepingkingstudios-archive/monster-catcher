@@ -6,6 +6,7 @@ require 'mithril/controllers/mixins/callback_helpers'
 require 'mithril/controllers/mixins/help_actions'
 require 'monster_catcher/controllers'
 require 'monster_catcher/controllers/character_controller'
+require 'monster_catcher/controllers/explore_controller'
 require 'monster_catcher/controllers/user_controller'
 require 'monster_catcher/controllers/mixins/character_helpers'
 require 'monster_catcher/controllers/mixins/user_helpers'
@@ -27,8 +28,10 @@ module MonsterCatcher::Controllers
         @proxy = Mithril::Controllers::CallbackController.new request
       elsif current_user.nil?
         @proxy = MonsterCatcher::Controllers::UserController.new request
-      else
+      elsif current_character.nil?
         @proxy = MonsterCatcher::Controllers::CharacterController.new request
+      else
+        @proxy = MonsterCatcher::Controllers::ExploreController.new request
       end # if
     end # method proxy
     
