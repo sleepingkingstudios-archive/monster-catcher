@@ -1,5 +1,7 @@
 # spec/monster_catcher/models/explore/node_spec.rb
 
+require 'yaml'
+
 require 'monster_catcher/spec_helper'
 
 require 'monster_catcher/models/explore/node'
@@ -96,5 +98,24 @@ describe MonsterCatcher::Models::Explore::Node do
       instance.description = description
       expect(instance.description).to eq description
     end # specify
+  end # describe
+  
+  describe "deserialization" do
+    let :key do FactoryGirl.generate :explore_node_key; end
+    let :name do key.upcase.gsub('_',' '); end
+    let :description do "#{name} is a dank hellhole."; end
+    let :yaml do {
+      :key         => key,
+      :name        => name,
+      :description => description
+    }.to_yaml end # let
+    
+    let :instance do described_class.new yaml; end
+    
+    specify { expect(instance).to be_valid }
+    
+    specify { expect(instance.key).to eq key }
+    specify { expect(instance.name).to eq name }
+    specify { expect(instance.description).to eq description }
   end # describe
 end # describe
