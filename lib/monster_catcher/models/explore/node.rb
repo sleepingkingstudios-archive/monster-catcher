@@ -14,6 +14,7 @@ module MonsterCatcher::Models::Explore
     
     # Relations
     belongs_to :region, :class_name => "MonsterCatcher::Models::Explore::Region"
+    embeds_many :edges, :class_name => "MonsterCatcher::Models::Explore::Edge"
     
     # Validations
     validates_presence_of :key, :region

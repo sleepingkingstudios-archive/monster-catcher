@@ -112,6 +112,27 @@ describe MonsterCatcher::Models::Explore::Node do
   
   describe "belongs to region" do
     specify { expect(instance).to respond_to(:region).with(0).arguments }
+    
+    specify { expect(instance.region).not_to be nil }
+  end # describe
+  
+  describe "embeds many edges" do
+    describe :edges do
+      specify { expect(instance).to respond_to(:edges).with(0).arguments }
+    end # describe
+    
+    context 'with edges added' do
+      let :edges do
+        [].tap do |ary| 3.times do ary << FactoryGirl.create(:explore_edge, :node => instance); end; end
+      end # let
+      
+      specify "node has edges" do
+        edges.each do |edge|
+          expect(instance.edges).to include edge
+          expect(edge.node).to eq instance
+        end # end
+      end # specify
+    end # context
   end # describe
   
   describe "deserialization" do
