@@ -10,6 +10,11 @@ task :console => "data:models" do
 end # task console
 
 namespace :data do
+  def get_yaml(*path)
+    path = File.join @remote_root, *path
+    YAML::load open path
+  end # method get_yaml
+  
   task :dump => "data:models" do
     include MonsterCatcher::Models
     
@@ -18,17 +23,34 @@ namespace :data do
   
   task :load => :dump do
     require 'open-uri'
-    remote_root   = 'https://raw.github.com/sleepingkingstudios/hinomoto/master/'
-    manifest_path = File.join remote_root, 'manifest.yml'
     
-    manifest = YAML::load open(manifest_path).read
+    @remote_root = 'https://raw.github.com/sleepingkingstudios/hinomoto/master/'
+    
+    manifest = get_yaml 'manifest.yml'
+    
+    region_paths = []
+    node_paths   = {}
     
     manifest["regions"].each do |region, nodes|
-      nodes.each do |node, value|
-        node_path = File.join remote_root, 'regions', region, node
-        node_data = YAML::load open node_path
-        
-        Explore::Node.create node_data
+      if region =~ /.yml$/
+        region_paths << File.join('regions', region)
+      elsif !nodes.nil?
+        node_paths[region] ||= []
+        nodes.each do |node, value|
+          node_paths[region] << File.join('regions', region, node)
+        end # each
+      end # elsif
+    end # each
+    
+    region_paths.each do |path| Explore::Region.create get_yaml path; end
+    
+    node_paths.each do |key, paths|
+      region = Explore::Region.find_by(:key => key)
+      
+      paths.each do |path|
+        node = Explore::Node.new get_yaml path
+        node.region = region
+        node.save
       end # each
     end # each
   end # task load

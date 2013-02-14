@@ -27,6 +27,16 @@ describe MonsterCatcher::Models::Explore::Node do
       specify { expect(instance).to have_errors.on(:key).
         with_message(/can't be blank/i) }
     end # describe
+
+    describe "requires a region" do
+      let :instance do
+        instance = described_class.new(attributes.tap { |hsh| hsh.delete :region })
+      end # instance
+
+      specify { expect(instance).not_to be_valid }
+      specify { expect(instance).to have_errors.on(:region).
+        with_message(/can't be blank/i) }
+    end # describe
   end # describe
   
   describe "creation" do
@@ -100,6 +110,10 @@ describe MonsterCatcher::Models::Explore::Node do
     end # specify
   end # describe
   
+  describe "belongs to region" do
+    specify { expect(instance).to respond_to(:region).with(0).arguments }
+  end # describe
+  
   describe "deserialization" do
     let :key do FactoryGirl.generate :explore_node_key; end
     let :name do key.upcase.gsub('_',' '); end
@@ -110,7 +124,10 @@ describe MonsterCatcher::Models::Explore::Node do
       :description => description
     }.to_yaml end # let
     
-    let :instance do described_class.new yaml; end
+    let :region do FactoryGirl.create :explore_region; end
+    let :instance do
+      described_class.new(yaml).tap { |obj| obj.region = region }
+    end # let
     
     specify { expect(instance).to be_valid }
     
