@@ -187,13 +187,8 @@ describe MonsterCatcher::Controllers::RoutingController do
   end # context
   
   context 'with a character selected' do
-    let :character do FactoryGirl.create :character; end
-    let :user do
-      user = FactoryGirl.build(:user)
-      user.character = character
-      user.save
-      user
-    end # let
+    let :user do FactoryGirl.create :user; end
+    let :character do FactoryGirl.create :character, :user_id => user.id; end
     let :request do
       super().tap { |req| req.session.update :character_id => character.id, :user_id => user.id }
     end # let

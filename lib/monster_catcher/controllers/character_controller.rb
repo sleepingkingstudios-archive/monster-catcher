@@ -3,7 +3,9 @@
 require 'mithril/controllers/abstract_controller'
 require 'mithril/controllers/mixins/callback_helpers'
 require 'mithril/controllers/mixins/help_actions'
+require 'mithril/errors/action_error'
 require 'monster_catcher/controllers'
+require 'monster_catcher/controllers/mixins/character_helpers'
 require 'monster_catcher/controllers/mixins/user_helpers'
 require 'monster_catcher/models/user'
 
@@ -11,12 +13,19 @@ module MonsterCatcher::Controllers
   class CharacterController < Mithril::Controllers::AbstractController
     mixin Mithril::Controllers::Mixins::CallbackHelpers
     mixin Mithril::Controllers::Mixins::HelpActions
+    mixin MonsterCatcher::Controllers::Mixins::CharacterHelpers
     mixin MonsterCatcher::Controllers::Mixins::UserHelpers
     
     define_action :new_game do |session, arguments|
       if arguments.first =~ /help/i
         return "The new game action creates a new character and starts a" +
           " game of Monster Catcher."
+      elsif current_user.nil?
+        raise Mithril::Errors::ActionError.new "expected current user not to be nil",
+          self.class, :_char_name, session, arguments
+      elsif !current_user.character.nil?
+        return "You have already created a character. To resume your" +
+          " previous game, enter \"resume game\"."
       end # if
       
       callbacks = { "" => { :controller => CharacterController, :action => :_char_name } }
@@ -26,8 +35,35 @@ module MonsterCatcher::Controllers
       "Please enter the name of your character."
     end # action new game
     
+    define_action :continue_game do |session, arguments|
+      if arguments.first =~ /help/i
+        return "The continue game command lets you resume a game with a" +
+          "previously-created character."
+      elsif current_user.nil?
+        raise Mithril::Errors::ActionError.new "expected current user not to be nil",
+          self.class, :_char_name, session, arguments
+      elsif !current_character.nil?
+        raise Mithril::Errors::ActionError.new "already a character selected",
+          self.class, :_char_name, session, arguments
+      elsif current_user.character.nil?
+        return "You have not yet created a character. To start a game with a" +
+          " new character, enter \"new game\"."
+      end # if
+      
+      character = current_user.character
+      request.session.update :character_id => character.id
+      
+      "Welcome back to the world of Monster Catcher, #{character.name}!"
+    end # action continue game
+    
     define_action :_char_name, :private => true do |session, arguments|
-      return nil if (user = current_user).nil?
+      if (user = current_user).nil?
+        raise Mithril::Errors::ActionError.new "expected current user not to be nil",
+          self.class, :_char_name, session, arguments
+      elsif !user.character.nil?
+        raise Mithril::Errors::ActionError.new "current user already has character",
+          self.class, :_char_name, session, arguments
+      end # if
       
       name = arguments.first
       

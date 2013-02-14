@@ -12,7 +12,15 @@ module MonsterCatcher::Controllers::Mixins
       return nil if (char_id = request.session[:character_id]).nil?
       
       begin
-        MonsterCatcher::Models::Character.find char_id
+        character = MonsterCatcher::Models::Character.find char_id
+        
+        if self.respond_to?(:current_user)
+          return nil if (user = current_user).nil?
+          
+          character.user == user ? character : nil
+        else
+          character
+        end # if
       rescue Mongoid::Errors::DocumentNotFound
         nil
       end # begin-rescue
