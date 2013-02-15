@@ -16,7 +16,17 @@ describe MonsterCatcher::Models::Explore::Edge do
     
     specify { expect(instance).to be_valid }
     
-    describe "requires a name" do
+    describe "requires a name or a direction" do
+      context 'with neither a name or a direction' do
+        let :attributes do super().tap { |hsh| hsh.delete :name; hsh.delete :direction }; end
+        
+        specify { expect(instance).not_to be_valid }
+        specify { expect(instance).to have_errors.on(:name).
+          with_message(/can't be blank/i) }
+        specify { expect(instance).to have_errors.on(:direction).
+          with_message(/can't be blank/i) }
+      end # context
+      
       let :instance do
         instance = described_class.new(attributes.tap { |hsh| hsh.delete :name })
       end # instance
@@ -69,6 +79,30 @@ describe MonsterCatcher::Models::Explore::Edge do
     specify 'updates the value' do
       instance.name = name
       expect(instance.name).to eq name
+    end # specify
+  end # describe
+  
+  describe :direction do
+    specify { expect(instance).to respond_to(:direction).with(0).arguments }
+    
+    specify { expect(instance.direction).to be nil }
+    
+    context 'set during initialization' do
+      let :direction do "east"; end
+      let :attributes do super().update :direction => direction; end
+      
+      specify { expect(instance.direction).to be attributes[:direction] }
+    end # context
+  end # describe
+  
+  describe :direction= do
+    let :direction do "east"; end
+    
+    specify { expect(instance).to respond_to(:direction=).with(1).arguments }
+    
+    specify 'updates the value' do
+      instance.direction = direction
+      expect(instance.direction).to eq direction
     end # specify
   end # describe
 

@@ -7,8 +7,8 @@ GIT
 PATH
   remote: ../truesilver
   specs:
-    mithril (0.3.5)
-    mithril-specs (0.3.5)
+    mithril (0.4.0)
+    mithril-specs (0.4.0)
 
 GEM
   remote: https://rubygems.org/
@@ -91,7 +91,7 @@ DEPENDENCIES
   factory_girl
   haml
   json
-  mithril (~> 0.3.0)!
+  mithril (~> 0.4.0)!
   mithril-specs!
   mongoid
   rake

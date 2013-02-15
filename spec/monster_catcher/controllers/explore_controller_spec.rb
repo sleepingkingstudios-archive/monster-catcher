@@ -43,6 +43,40 @@ describe MonsterCatcher::Controllers::ExploreController do
     end # context
   end # describe
   
+  describe :node_string do
+    specify { expect(instance).to respond_to(:node_string).with(1).arguments }
+    
+    specify { expect(instance.node_string node).to eq "You are in #{node.name}." }
+  end # describe
+  
+  describe :edges_string do
+    specify { expect(instance).to respond_to(:edges_string).with(1).arguments }
+
+    specify { expect(instance.edges_string node).to eq "There is nowhere to go from here." }
+    
+    context 'with edges defined on the node' do
+      before :each do
+        node.edges.create :path => FactoryGirl.generate(:explore_node_key), :direction => "north"
+        node.edges.create :path => FactoryGirl.generate(:explore_node_key), :direction => "east"
+        node.edges.create :path => FactoryGirl.generate(:explore_node_key), :name => "blind man's bluff"
+        node.edges.create :path => FactoryGirl.generate(:explore_node_key), :name => "dead man's tree"
+        node.edges.create :path => FactoryGirl.generate(:explore_node_key), :name => "neverland",
+          :direction => "second star to the right, and straight on 'till morning"
+      end # before each
+      
+      specify { expect(instance.edges_string node).to match /go to the following locations/i }
+      
+      specify "lists each of the nodes" do
+        text = instance.edges_string node
+        
+        node.edges.each do |edge|
+          expect(text).to match /#{edge.direction}/ unless edge.direction.nil?
+          expect(text).to match /to #{edge.name}/ unless edge.name.nil?
+        end # each
+      end # specify
+    end # context
+  end # describe
+  
   describe "where action" do
     specify { expect(instance).to have_action :where }
     specify { expect(instance).to have_command "where" }
@@ -62,6 +96,9 @@ describe MonsterCatcher::Controllers::ExploreController do
       
       specify { expect(instance.invoke_command text).
         to match /lost in the void between worlds/i }
+      
+      specify { expect(instance.invoke_command text).
+        to match /nowhere to go from here/i }
     end # context
     
     context 'with "am I"' do
@@ -69,6 +106,22 @@ describe MonsterCatcher::Controllers::ExploreController do
       
       specify { expect(instance.invoke_command text).
         to match /you are in #{node.name}/i }
+    end # context
+
+    context 'with "can I go"' do
+      let :text do "where can I go"; end
+
+      specify { expect(instance.invoke_command text).
+        to match /nowhere to go from here/i }
+      
+      context 'with edges defined on the node' do
+        before :each do
+          node.edges.create :path => FactoryGirl.generate(:explore_node_key), :direction => "north"
+        end # before each
+        
+        specify { expect(instance.invoke_command text).
+          to match /can go to the following locations/i }
+      end # context
     end # context
     
     context 'with no arguments' do
