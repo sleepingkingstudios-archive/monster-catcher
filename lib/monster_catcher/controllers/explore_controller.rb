@@ -63,6 +63,8 @@ module MonsterCatcher::Controllers
       
       if text =~ /^am I/
         self.node_string current_node
+      elsif text =~ /^can I go/
+        self.edges_string current_node
       else
         "#{self.node_string current_node}\n\n#{self.edges_string current_node}"
       end # if-else
