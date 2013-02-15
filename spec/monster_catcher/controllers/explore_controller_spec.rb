@@ -47,6 +47,12 @@ describe MonsterCatcher::Controllers::ExploreController do
     specify { expect(instance).to respond_to(:node_string).with(1).arguments }
     
     specify { expect(instance.node_string node).to eq "You are in #{node.name}." }
+    
+    context 'with a nameless node' do
+      before :each do node.name = nil; end
+      
+      specify { expect(instance.node_string node).to eq "You are in #{node.region.name}." }
+    end # context
   end # describe
   
   describe :edges_string do
@@ -64,7 +70,7 @@ describe MonsterCatcher::Controllers::ExploreController do
           :direction => "second star to the right, and straight on 'till morning"
       end # before each
       
-      specify { expect(instance.edges_string node).to match /go to the following locations/i }
+      specify { expect(instance.edges_string node).to match /you can go/i }
       
       specify "lists each of the nodes" do
         text = instance.edges_string node
@@ -120,7 +126,7 @@ describe MonsterCatcher::Controllers::ExploreController do
         end # before each
         
         specify { expect(instance.invoke_command text).
-          to match /can go to the following locations/i }
+          to match /you can go/i }
       end # context
     end # context
     

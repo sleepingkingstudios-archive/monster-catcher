@@ -5,6 +5,9 @@ require 'mithril/controllers/mixins/help_actions'
 require 'mithril/parsers/contextual_parser'
 require 'monster_catcher/controllers'
 require 'monster_catcher/controllers/mixins/character_helpers'
+require 'monster_catcher/models/explore/edge'
+require 'monster_catcher/models/explore/node'
+require 'monster_catcher/models/explore/region'
 
 module MonsterCatcher::Controllers
   class ExploreController < Mithril::Controllers::AbstractController
@@ -24,7 +27,7 @@ module MonsterCatcher::Controllers
     def node_string(node)
       return "You are forever lost in the void between worlds." if node.nil?
       
-      "You are in #{node.name}."
+      node.name.nil? ? "You are in #{node.region.name}." : "You are in #{node.name}."
     end # method node_string
     
     def edges_string(node)
@@ -44,7 +47,7 @@ module MonsterCatcher::Controllers
       segments = directions.sort + locations.sort
       last_segment = segments.pop
       
-      str = "You can go to the following locations: "
+      str = "You can go "
       str += segments.join(", ") + ", and " if 0 < segments.count
       str += "#{last_segment}."
       

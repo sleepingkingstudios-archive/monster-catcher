@@ -53,7 +53,13 @@ module MonsterCatcher::Controllers
       character = current_user.character
       request.session.update :character_id => character.id
       
-      "Welcome back to the world of Monster Catcher, #{character.name}!"
+      str = "Welcome back to the world of Monster Catcher, #{character.name}!"
+      
+      unless (node = character.current_node).nil?
+        str += "\n\nYou are currently in " + (node.name.nil? ? node.region.name : node.name) + "."
+      end # unless
+      
+      str
     end # action continue game
     
     define_action :_char_name, :private => true do |session, arguments|
@@ -65,12 +71,15 @@ module MonsterCatcher::Controllers
           self.class, :_char_name, session, arguments
       end # if
       
-      name = arguments.first
+      name = arguments.join(" ")
       
-      user.create_character :name => name
-      request.session.update :character_id => user.character.id
+      region = MonsterCatcher::Models::Explore::Region.find_by(:key => "bird_town")
+      node   = region.nodes.find_by(:key => "main_square")
       
-      "Welcome to the world of Monster Catcher, #{name}!"
+      character = user.create_character :name => name, :node_id => node.id
+      request.session.update :character_id => character.id
+      
+      "Welcome to the world of Monster Catcher, #{name}!\n\n#{node.description}"
     end # private action char name 
   end # class
 end # module

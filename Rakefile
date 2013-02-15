@@ -53,7 +53,6 @@ namespace :data do
         node.save
         
         edges = node.instance_variable_get :@edges
-        puts "path = #{path}, edges = #{edges}"
       end # each
     end # each
   end # task load

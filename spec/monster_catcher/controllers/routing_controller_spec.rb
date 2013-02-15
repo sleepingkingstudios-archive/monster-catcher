@@ -160,6 +160,13 @@ describe MonsterCatcher::Controllers::RoutingController do
         let :character_name do FactoryGirl.generate :character_name; end
         let :text do character_name; end
         
+        let! :starter_region do
+          MonsterCatcher::Models::Explore::Region.create! :key => "bird_town", :name => "Bird Town"
+        end # let
+        let! :starter_node do
+          FactoryGirl.create :explore_node, :key => "main_square", :region => starter_region
+        end # let
+        
         before :each do request.session.update :callbacks => callbacks; end
         
         specify { expect(instance.can_invoke? text).to be true }
