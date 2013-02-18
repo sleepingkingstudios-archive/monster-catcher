@@ -86,7 +86,10 @@ describe MonsterCatcher::Controllers::CharacterController do
   
   describe "char name action" do
     let :user do FactoryGirl.create :user; end
-    let :request do FactoryGirl.build :request, :session => { :user_id => user.id }; end
+    let :callbacks do { "" => "CharacterController,_char_name" }; end
+    let :request do FactoryGirl.build :request, :session =>
+      { :user_id => user.id, :callbacks => callbacks }
+    end # let
     
     let :name do FactoryGirl.generate :character_name; end
     
@@ -126,6 +129,7 @@ describe MonsterCatcher::Controllers::CharacterController do
     end # specify
     
     specify 'clears the callback from the session' do
+      instance.invoke_action :_char_name, [name], true
       expect(request.session).not_to have_key :callbacks
     end # specify
     
@@ -136,7 +140,22 @@ describe MonsterCatcher::Controllers::CharacterController do
         to raise_error Mithril::Errors::ActionError, /user not to be nil/i }
       
       specify 'clears the callback from the session' do
+        begin
+          instance.invoke_action :_char_name, [name], true
+        rescue Mithril::Errors::ActionError; end
         expect(request.session).not_to have_key :callbacks
+      end # specify
+    end # context
+    
+    context 'with an empty character name' do
+      let :name do ""; end
+      
+      specify { expect(instance.invoke_action :_char_name, [name], true).
+        to match /please enter the name of your character/i }
+      
+      specify 'does not clear the callback from the session' do
+        instance.invoke_action :_char_name, [name], true
+        expect(request.session).to have_key :callbacks
       end # specify
     end # context
     
@@ -150,6 +169,9 @@ describe MonsterCatcher::Controllers::CharacterController do
         to raise_error Mithril::Errors::ActionError, /current user already has character/i }
       
       specify 'clears the callback from the session' do
+        begin
+          instance.invoke_action :_char_name, [name], true
+        rescue Mithril::Errors::ActionError; end
         expect(request.session).not_to have_key :callbacks
       end # specify
     end # context

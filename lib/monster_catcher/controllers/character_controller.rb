@@ -64,20 +64,23 @@ module MonsterCatcher::Controllers
     
     define_action :_char_name, :private => true do |session, arguments|
       if (user = current_user).nil?
+        request.session.delete :callbacks
         raise Mithril::Errors::ActionError.new "expected current user not to be nil",
           self.class, :_char_name, session, arguments
       elsif !user.character.nil?
+        request.session.delete :callbacks
         raise Mithril::Errors::ActionError.new "current user already has character",
           self.class, :_char_name, session, arguments
+      elsif (name = arguments.join(" ")).empty?
+        return "Please enter the name of your character."
       end # if
-      
-      name = arguments.join(" ")
       
       region = MonsterCatcher::Models::Explore::Region.find_by(:key => "bird_town")
       node   = region.nodes.find_by(:key => "main_square")
       
       character = user.create_character :name => name, :node_id => node.id
       request.session.update :character_id => character.id
+      request.session.delete :callbacks
       
       "Welcome to the world of Monster Catcher, #{name}!\n\n#{node.description}"
     end # private action char name 
