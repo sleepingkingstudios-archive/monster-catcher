@@ -73,47 +73,55 @@ describe MonsterCatcher::Models::Character do
     end # specify
   end # describe name=
   
-  describe :node_id do
-    specify { expect(instance).to respond_to(:node_id).with(0).arguments }
+  describe :node_key do
+    specify { expect(instance).to respond_to(:node_key).with(0).arguments }
     
-    specify { expect(instance.node_id).to be nil }
+    specify { expect(instance.node_key).to be nil }
     
     context 'with a node defined at creation' do
-      let :node do FactoryGirl.create :explore_node; end
-      let :attributes do super().update :node_id => node.id; end
+      let :node_key do
+        region = FactoryGirl.generate :explore_region_key
+        node   = FactoryGirl.generate :explore_node_key
+        "#{region}:#{node}"
+      end # let
+      let :attributes do super().update :node_key => node_key; end
       
-      specify { expect(instance.node_id).to eq node.id }
+      specify { expect(instance.node_key).to eq node_key }
     end # context
   end # describe node_id
   
-  describe :node_id= do
-    let :node do FactoryGirl.create :explore_node; end
+  describe :node_key= do
+    let :node_key do
+      region = FactoryGirl.generate :explore_region_key
+      node   = FactoryGirl.generate :explore_node_key
+      "#{region}:#{node}"
+    end # let
     
-    specify { expect(instance).to respond_to(:node_id=).with(1).arguments }
+    specify { expect(instance).to respond_to(:node_key=).with(1).arguments }
     
     specify 'updates the value' do
-      instance.node_id = node.id
-      expect(instance.node_id).to eq node.id
+      instance.node_key = node_key
+      expect(instance.node_key).to eq node_key
     end # specify
   end # describe node_id=
   
   describe :current_node do
+    let :node do FactoryGirl.create :explore_node; end
+    let :node_key do "#{node.region.key}:#{node.key}"; end
+    
     specify { expect(instance).to respond_to(:current_node).with(0).arguments }
     
     specify { expect(instance.current_node).to be nil }
     
     context 'with a node defined at creation' do
-      let :node do FactoryGirl.create :explore_node; end
-      let :attributes do super().update :node_id => node.id; end
+      let :attributes do super().update :node_key => node_key; end
       
       specify { expect(instance.current_node).to eq node }
     end # context
     
-    context 'with a node set via :node=' do
-      let :node do FactoryGirl.create :explore_node; end
-      
+    context 'with a node set via :node_key=' do
       specify 'returns the node' do
-        instance.node_id = node.id
+        instance.node_key = node_key
         expect(instance.current_node).to eq node
       end # specify
     end # context
@@ -125,15 +133,17 @@ describe MonsterCatcher::Models::Character do
     context 'with a nil value' do
       before :each do instance.current_node = nil; end
       
-      specify { expect(instance.node_id).to be nil }
+      specify { expect(instance.node_key).to be nil }
       specify { expect(instance.current_node).to be nil }
     end # context
 
     context 'with a valid node' do
       let :node do FactoryGirl.create :explore_node; end
+      let :node_key do "#{node.region.key}:#{node.key}"; end
+      
       before :each do instance.current_node = node; end
 
-      specify { expect(instance.node_id).to eq node.id }
+      specify { expect(instance.node_key).to eq node_key }
       specify { expect(instance.current_node).to eq node }
     end # context
   end # describe current_node=

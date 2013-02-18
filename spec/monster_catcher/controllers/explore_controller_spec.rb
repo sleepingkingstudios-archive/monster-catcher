@@ -14,7 +14,8 @@ describe MonsterCatcher::Controllers::ExploreController do
     node.save
     node
   end # let
-  let :character do FactoryGirl.create :character, :node_id => node.id; end
+  let :node_key do "#{node.region.key}:#{node.key}"; end
+  let :character do FactoryGirl.create :character, :node_key => node_key; end
   let :request do
     FactoryGirl.build :request, :session => { :character_id => character.id }
   end # let request
