@@ -137,4 +137,29 @@ describe MonsterCatcher::Controllers::ExploreController do
         to match /you are in #{node.name}/i }
     end # context
   end # describe
+  
+  describe "look action" do
+    let :text do "look"; end
+    
+    specify { expect(instance).to have_action :look }
+    specify { expect(instance).to have_command "look" }
+    specify { expect(instance.can_invoke? text).to be true }
+    
+    context 'with "help"' do
+      let :text do "look help"; end
+      
+      specify { expect(instance.invoke_command text).to match /the look action/i }
+    end # context
+    
+    context 'with no current node' do
+      before :each do instance.stub :current_node do nil; end; end
+      
+      specify { expect(instance.invoke_command text).
+        to match /an echoing, timeless void/i }
+    end # context
+    
+    context 'with no arguments' do
+      specify { expect(instance.invoke_command text).to match /#{node.description}/ }
+    end # context
+  end # describe
 end # describe

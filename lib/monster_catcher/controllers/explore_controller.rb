@@ -53,6 +53,20 @@ module MonsterCatcher::Controllers
       
       str
     end # method edges_string
+
+    define_action :look do |session, arguments|
+      text = (arguments[nil] || []).join(" ")
+      
+      if text =~ /^help/i
+        return "The look action lets you examine your current location and" +
+          " its surroundings."
+      elsif current_node.nil?
+        return "There is nothing but an echoing, timeless void. Hope you" +
+          " brought a good book."
+      end # if
+
+      current_node.description
+    end # define action
     
     define_action :where do |session, arguments|
       text = (arguments[nil] || []).join(" ")
@@ -62,7 +76,7 @@ module MonsterCatcher::Controllers
           " character's current location. For the name of the location" +
           ", enter \"where am I\". For places you can go, enter \"where can" +
           " I go\". For both the name and places to go, enter \"where\"."
-      end # if-elsif
+      end # if
       
       if text =~ /^am I/
         self.node_string current_node
