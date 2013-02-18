@@ -22,16 +22,14 @@ module MonsterCatcher::Models
     def current_node
       return nil if self.node_key.nil?
       
-      begin
-        segments   = self.node_key.split(':')
-        node_key   = segments.pop
-        region_key = segments.pop
-        
-        region = MonsterCatcher::Models::Explore::Region.find_by(:key => region_key)
-        node   = region.nodes.find_by(:key => node_key)
-      rescue Mongoid::Errors::DocumentNotFound
-        nil
-      end # begin-rescue
+      segments   = self.node_key.split(':')
+      node_key   = segments.pop
+      region_key = segments.pop
+      
+      region = MonsterCatcher::Models::Explore::Region.find_by(:key => region_key)
+      node   = region.nodes.find_by(:key => node_key)
+    rescue Mongoid::Errors::DocumentNotFound
+      nil
     end # method current_user
     
     def current_node=(node)

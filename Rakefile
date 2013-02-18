@@ -18,6 +18,7 @@ namespace :data do
   task :dump => "data:models" do
     include MonsterCatcher::Models
     
+    Explore::Region.destroy_all
     Explore::Node.destroy_all
   end # task
   

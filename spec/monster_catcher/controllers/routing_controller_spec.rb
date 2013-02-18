@@ -161,7 +161,7 @@ describe MonsterCatcher::Controllers::RoutingController do
         let :text do character_name; end
         
         let! :starter_region do
-          MonsterCatcher::Models::Explore::Region.create! :key => "bird_town", :name => "Bird Town"
+          MonsterCatcher::Models::Explore::Region.create! :key => "village_aether", :name => "the Village of Aether"
         end # let
         let! :starter_node do
           FactoryGirl.create :explore_node, :key => "main_square", :region => starter_region

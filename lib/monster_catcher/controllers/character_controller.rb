@@ -75,10 +75,13 @@ module MonsterCatcher::Controllers
         return "Please enter the name of your character."
       end # if
       
-      region = MonsterCatcher::Models::Explore::Region.find_by(:key => "bird_town")
+      region = MonsterCatcher::Models::Explore::Region.find_by(:key => "village_aether")
       node   = region.nodes.find_by(:key => "main_square")
       
-      character = user.create_character :name => name, :node_id => node.id
+      character = user.build_character :name => name
+      character.current_node = node
+      character.save
+      
       request.session.update :character_id => character.id
       request.session.delete :callbacks
       

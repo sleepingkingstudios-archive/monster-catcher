@@ -24,6 +24,38 @@ module MonsterCatcher::Controllers
       current_character.current_node
     end # method current_node
     
+    def resolve_edge params
+      return nil if current_node.nil?
+      
+      if params.has_key? :name
+        return current_node.edges.find_by(:name => params[:name])
+      elsif params.has_key? :direction
+        return current_node.edges.find_by(:direction => params[:direction])
+      end # if
+      
+      nil
+    rescue Mongoid::Errors::DocumentNotFound
+      nil
+    end # method resolve_edge
+    
+    def resolve_node params
+      return nil if (edge = resolve_edge params).nil?
+      
+      segments   = edge.path.split ":"
+      node_key   = segments.pop
+      region_key = segments.pop
+      
+      if region_key.nil? || region_key.empty?
+        region = current_node.region
+      else
+        region = MonsterCatcher::Models::Explore::Region.find_by(:key => region_key)
+      end # if-else
+      
+      node = region.nodes.find_by(:key => node_key)
+    rescue Mongoid::Errors::DocumentNotFound
+      nil
+    end # method resolve_node
+    
     def node_string(node)
       return "You are forever lost in the void between worlds." if node.nil?
       
@@ -53,12 +85,44 @@ module MonsterCatcher::Controllers
       
       str
     end # method edges_string
+    
+    define_action :go do |session, arguments|
+      key  = :receiver
+      text = (arguments[nil] || []).join(" ")
+      name = (arguments[key] || []).join(" ")
+      
+      if text =~ /^help/i
+        return "The go command lets you move to a nearby location. To move" +
+          " a specific direction, enter \"go DIRECTION\". To move to a named" +
+          " location, enter \"go to LOCATION\"."
+      elsif text.empty? && name.empty?
+        return "Please choose a direction to go in or a named location to go" +
+          " to. For assistance, enter \"go help\", or enter \"where can I" +
+          " go\" for a list of destinations."
+      end # if
+      
+      if name.empty?
+        node = self.resolve_node :direction => text
+        
+        return "I'm sorry, I don't know how to go #{text} from here." if node.nil?
+      else
+        node = self.resolve_node :name => name
+        
+        return "I'm sorry, I don't know where #{name} is." if node.nil?
+      end # if
+      
+      character = current_character
+      character.current_node = node
+      character.save!
+      
+      node.description
+    end # method define_action
 
     define_action :look do |session, arguments|
       text = (arguments[nil] || []).join(" ")
       
       if text =~ /^help/i
-        return "The look action lets you examine your current location and" +
+        return "The look command lets you examine your current location and" +
           " its surroundings."
       elsif current_node.nil?
         return "There is nothing but an echoing, timeless void. Hope you" +
