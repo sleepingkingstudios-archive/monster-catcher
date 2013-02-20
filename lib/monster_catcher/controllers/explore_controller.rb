@@ -82,6 +82,10 @@ module MonsterCatcher::Controllers
       str
     end # method edges_string
     
+    def interactive_objects
+      current_node.nil? ? super : super + current_node.objects
+    end # method interactive_objects
+    
     define_action :go do |session, arguments|
       key  = :receiver
       text = (arguments[nil] || []).join(" ")

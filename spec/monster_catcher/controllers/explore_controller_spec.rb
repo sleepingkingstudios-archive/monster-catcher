@@ -174,6 +174,17 @@ describe MonsterCatcher::Controllers::ExploreController do
     end # context
   end # describe
   
+  describe :interactive_objects do
+    let! :object do
+      FactoryGirl.create :explore_node_object, :node => node,
+        :actions => { FactoryGirl.generate(:action_key) => "Data" }
+    end # let
+    
+    specify 'includes the node objects' do
+      expect(instance.interactive_objects).to include object
+    end # specify
+  end # describe
+  
   describe "where action" do
     specify { expect(instance).to have_action :where }
     specify { expect(instance).to have_command "where" }

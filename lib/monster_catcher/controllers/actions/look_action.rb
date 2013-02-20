@@ -22,16 +22,16 @@ module MonsterCatcher::Controllers::Actions
         return current_node.description
       end # if-elsif
       
-      target = arguments[:target].first
+      target = arguments[:target].first.gsub(/^the/,'').strip
       
       unless (action = object_actions["look"]).nil?
         object_actions["look"].each do |key, data|
-          return data if key == target
+          return data if key.gsub(/^the/,'').strip == target
         end # each
       end # unless
       
       message = "I'm sorry, I don't see "
-      message += (target =~ /^[aeiou]/ ? "an " : "a ") unless target =~ /^the/
+      message += (target =~ /^[aeiou]/ ? "an " : "a ")
       message += "#{target}."
       
       message
