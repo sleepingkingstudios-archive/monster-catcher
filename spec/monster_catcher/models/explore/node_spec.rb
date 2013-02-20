@@ -135,6 +135,25 @@ describe MonsterCatcher::Models::Explore::Node do
     end # context
   end # describe
   
+  describe "embeds many objects" do
+    describe :objects do
+      specify { expect(instance).to respond_to(:objects).with(0).arguments }
+    end # describe
+    
+    context 'with objects added' do
+      let :objects do [].tap do |ary|
+        3.times do ary << MonsterCatcher::Models::Explore::NodeObject.create(:node => instance); end
+      end; end # tap, let
+      
+      specify "node has objects" do
+        objects.each do |object|
+          expect(instance.objects).to include object
+          expect(object.node).to eq instance
+        end # end
+      end # specify
+    end # context
+  end # describe
+  
   describe "deserialization" do
     let :key do FactoryGirl.generate :explore_node_key; end
     let :name do key.upcase.gsub('_',' '); end

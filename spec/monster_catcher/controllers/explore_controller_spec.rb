@@ -1,8 +1,9 @@
 # spec/controllers/explore_controller_spec.rb
 
 require 'monster_catcher/spec_helper'
-require 'mithril/controllers/abstract_controller_helper'
 require 'mithril/controllers/mixins/help_actions_helper'
+require 'monster_catcher/controllers/interactive_controller_helper'
+require 'monster_catcher/controllers/actions/look_action_helper'
 require 'monster_catcher/controllers/mixins/character_helpers_helper'
 
 require 'monster_catcher/controllers/explore_controller'
@@ -22,8 +23,9 @@ describe MonsterCatcher::Controllers::ExploreController do
   let :described_class do Class.new super(); end
   let :instance do described_class.new request; end
   
-  it_behaves_like Mithril::Controllers::AbstractController
   it_behaves_like Mithril::Controllers::Mixins::HelpActions
+  it_behaves_like MonsterCatcher::Controllers::InteractiveController
+  it_behaves_like MonsterCatcher::Controllers::Actions::LookAction
   it_behaves_like MonsterCatcher::Controllers::Mixins::CharacterHelpers
   
   describe :current_node do
@@ -224,31 +226,6 @@ describe MonsterCatcher::Controllers::ExploreController do
       
       specify { expect(instance.invoke_command text).
         to match /you are in #{node.name}/i }
-    end # context
-  end # describe
-  
-  describe "look action" do
-    let :text do "look"; end
-    
-    specify { expect(instance).to have_action :look }
-    specify { expect(instance).to have_command "look" }
-    specify { expect(instance.can_invoke? text).to be true }
-    
-    context 'with "help"' do
-      let :text do "look help"; end
-      
-      specify { expect(instance.invoke_command text).to match /the look command/i }
-    end # context
-    
-    context 'with no current node' do
-      before :each do instance.stub :current_node do nil; end; end
-      
-      specify { expect(instance.invoke_command text).
-        to match /an echoing, timeless void/i }
-    end # context
-    
-    context 'with no arguments' do
-      specify { expect(instance.invoke_command text).to match /#{node.description}/ }
     end # context
   end # describe
   

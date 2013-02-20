@@ -1,5 +1,6 @@
 # lib/monster_catcher/models.rb
 
+require 'mongoid'
 require 'yaml'
 
 require 'monster_catcher'

@@ -1,22 +1,18 @@
 # lib/monster_catcher/controllers/explore_controller.rb
 
-require 'mithril/controllers/abstract_controller'
 require 'mithril/controllers/mixins/help_actions'
-require 'mithril/parsers/contextual_parser'
-require 'monster_catcher/controllers'
+require 'monster_catcher/controllers/interactive_controller'
+require 'monster_catcher/controllers/actions/look_action'
 require 'monster_catcher/controllers/mixins/character_helpers'
 require 'monster_catcher/models/explore/edge'
 require 'monster_catcher/models/explore/node'
 require 'monster_catcher/models/explore/region'
 
 module MonsterCatcher::Controllers
-  class ExploreController < Mithril::Controllers::AbstractController
+  class ExploreController < InteractiveController
     mixin Mithril::Controllers::Mixins::HelpActions
+    mixin MonsterCatcher::Controllers::Actions::LookAction
     mixin MonsterCatcher::Controllers::Mixins::CharacterHelpers
-    
-    def parser
-      @parser ||= Mithril::Parsers::ContextualParser.new(self)
-    end # method parser
     
     def current_node
       return nil if current_character.nil?
@@ -117,20 +113,6 @@ module MonsterCatcher::Controllers
       
       node.description
     end # method define_action
-
-    define_action :look do |session, arguments|
-      text = (arguments[nil] || []).join(" ")
-      
-      if text =~ /^help/i
-        return "The look command lets you examine your current location and" +
-          " its surroundings."
-      elsif current_node.nil?
-        return "There is nothing but an echoing, timeless void. Hope you" +
-          " brought a good book."
-      end # if
-
-      current_node.description
-    end # define action
     
     define_action :where do |session, arguments|
       text = (arguments[nil] || []).join(" ")

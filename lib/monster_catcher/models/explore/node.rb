@@ -1,6 +1,8 @@
 # lib/monster_catcher/models/explore/node.rb
 
 require 'monster_catcher/models/explore'
+require 'monster_catcher/models/explore/edge'
+require 'monster_catcher/models/explore/node_object'
 require 'monster_catcher/models/explore/region'
 
 module MonsterCatcher::Models::Explore
@@ -13,8 +15,9 @@ module MonsterCatcher::Models::Explore
     field :description, :type => String
     
     # Relations
-    belongs_to :region, :class_name => "MonsterCatcher::Models::Explore::Region"
-    embeds_many :edges, :class_name => "MonsterCatcher::Models::Explore::Edge"
+    belongs_to :region,   :class_name => "MonsterCatcher::Models::Explore::Region"
+    embeds_many :edges,   :class_name => "MonsterCatcher::Models::Explore::Edge"
+    embeds_many :objects, :class_name => "MonsterCatcher::Models::Explore::NodeObject"
     
     # Validations
     validates_presence_of :key, :region
