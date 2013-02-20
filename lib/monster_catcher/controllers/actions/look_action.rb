@@ -22,11 +22,11 @@ module MonsterCatcher::Controllers::Actions
         return current_node.description
       end # if-elsif
       
-      target = arguments[:target].first.gsub(/^the/,'').strip
+      target = arguments[:target].first.gsub(/^the/,'').strip.downcase
       
       unless (action = object_actions["look"]).nil?
         object_actions["look"].each do |key, data|
-          return data if key.gsub(/^the/,'').strip == target
+          return data if key.gsub(/^the/,'').strip.downcase == target
         end # each
       end # unless
       

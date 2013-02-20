@@ -88,8 +88,8 @@ module MonsterCatcher::Controllers
     
     define_action :go do |session, arguments|
       key  = :receiver
-      text = (arguments[nil] || []).join(" ")
-      name = (arguments[key] || []).join(" ")
+      text = (arguments[nil] || []).join(" ").downcase
+      name = (arguments[key] || []).join(" ").downcase
       
       if text =~ /^help/i
         return "The go command lets you move to a nearby location. To move" +
