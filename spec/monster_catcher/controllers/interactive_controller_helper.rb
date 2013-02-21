@@ -31,9 +31,13 @@ shared_examples_for MonsterCatcher::Controllers::InteractiveController do
         3.times do
           key  = FactoryGirl.generate(:action_key).to_s
           data = key.gsub('_',' ').gsub(/action/,'data').capitalize
+          aliases = [*0..2].map do |index|
+            "alias #{key.gsub(/[^\d]/,'')}-#{index}"
+          end # map
           ary << MonsterCatcher::Models::InteractiveObject.create({
             :key => data.gsub(/data/i,'object'),
-            :actions => { key => data, shared_key => data }
+            :actions => { key => data, shared_key => data },
+            :aliases => aliases
           }) # end obj
         end # times
       end; end # tap, let
@@ -47,6 +51,11 @@ shared_examples_for MonsterCatcher::Controllers::InteractiveController do
             expect(hsh).to have_key action
             expect(hsh[action]).to have_key object.key
             expect(hsh[action][object.key]).to eq object.actions[action]
+            
+            object.aliases.each do |name|
+              expect(hsh[action]).to have_key name
+              expect(hsh[action][name]).to eq object.actions[action]
+            end # each
           end # each
         end # each
       end # specify

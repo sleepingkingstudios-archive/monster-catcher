@@ -8,6 +8,7 @@ module MonsterCatcher::Models
     
     field :key,     :type => String
     field :actions, :type => Hash
+    field :aliases, :type => Array
     
     def initialize attrs = nil, options = nil
       super

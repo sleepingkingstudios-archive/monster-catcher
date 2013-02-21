@@ -40,6 +40,23 @@ shared_examples_for MonsterCatcher::Models::InteractiveObject do
       expect(instance.key).to eq key
     end # specify
   end # describe
+  
+  describe :aliases do
+    specify { expect(instance).to respond_to(:aliases).with(0).arguments }
+    
+    specify { expect(instance.aliases).to be_a [Array, nil] }
+  end # describe
+  
+  describe :aliases= do
+    let :aliases do [*0..2].map do FactoryGirl.generate :explore_node_object_key; end; end
+    
+    specify { expect(instance).to respond_to(:aliases=).with(1).arguments }
+    
+    specify 'sets the value' do
+      instance.aliases = aliases
+      aliases.each do |name| expect(instance.aliases).to include name; end
+    end # specify
+  end # describe
 end # shared examples
 
 shared_examples_for "MonsterCatcher::Models::InteractiveObject#creation" do

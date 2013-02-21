@@ -18,7 +18,12 @@ module MonsterCatcher::Controllers
       @object_actions = Hash.new
       interactive_objects.each do |object|
         object.actions.each do |action, value|
-          (@object_actions[action] ||= {})[object.key] = value
+          @object_actions[action] ||= {}
+          @object_actions[action][object.key] = value
+          
+          object.aliases.each do |name|
+            @object_actions[action][name] = value
+          end unless object.aliases.nil?
         end # each
       end # each
       
