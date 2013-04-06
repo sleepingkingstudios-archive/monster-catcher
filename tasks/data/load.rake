@@ -21,6 +21,7 @@ namespace :data do
     Mithril.logger << "~~~~~\n"
     Mithril.logger.info "Running rake data:load, environment = #{environment}"
     
+    # Set the remote URL
     case environment
     when :production
       root = 'https://raw.github.com/sleepingkingstudios/hinomoto/master/'
@@ -34,11 +35,13 @@ namespace :data do
       fail message
     end # case
     
+    # Load the manifest file
     manifest = get_yaml root, 'manifest.yml'
     
     region_paths = []
     node_paths   = {}
     
+    # Load region data and deserialize regions
     manifest["regions"].each do |region, nodes|
       if region =~ /.yml$/
         Explore::Region.create get_yaml root, 'regions', region
@@ -50,6 +53,7 @@ namespace :data do
       end # elsif
     end # each
     
+    # Deserialize node data
     node_paths.each do |key, paths|
       region = Explore::Region.find_by(:key => key)
       
@@ -58,6 +62,13 @@ namespace :data do
         node.region = region
         node.save
       end # each
+    end # each
+    
+    # Load and deserialize species data
+    manifest["species"].each do |species, _|
+      if species =~ /.yml$/
+        Monsters::Species.create get_yaml root, 'species', species
+      end # if
     end # each
   end # task load
 end # namespace

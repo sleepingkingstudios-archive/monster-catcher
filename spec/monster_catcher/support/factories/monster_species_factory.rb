@@ -10,10 +10,11 @@ FactoryGirl.define do
     
     types []
     
-    hit_points       100
-    physical_attack  100
-    physical_defense 100
-    special_attack   100
-    special_defense  100
+    hit_points       1.00
+    physical_attack  1.00
+    physical_defense 1.00
+    special_attack   1.00
+    special_defense  1.00
+    speed            1.00
   end # factory
 end # define

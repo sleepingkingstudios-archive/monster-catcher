@@ -9,5 +9,7 @@ namespace :data do
     
     Explore::Region.destroy_all
     Explore::Node.destroy_all
+    
+    Monsters::Species.destroy_all
   end # task
 end # namespace

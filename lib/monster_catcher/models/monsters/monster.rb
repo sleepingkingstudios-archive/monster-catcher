@@ -16,9 +16,11 @@ module MonsterCatcher::Models::Monsters
     field :physical_defense, :type => Integer
     field :special_attack,   :type => Integer
     field :special_defense,  :type => Integer
+    field :speed,            :type => Integer
     
     #=# Relations #=#
     belongs_to :species, :class_name => "MonsterCatcher::Models::Monsters::Species"
+    belongs_to :trainer, :polymorphic => true
     
     #=# Validation #=#
     validates :species, :presence => true

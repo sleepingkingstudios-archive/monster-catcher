@@ -9,7 +9,7 @@ describe MonsterCatcher::Models::Monsters::Monster do
   
   def self.fields
     [ :level, :hit_points, :physical_attack, :physical_defense,
-      :special_attack, :special_defense ]
+      :special_attack, :special_defense, :speed ]
   end # class method fields
   
   describe "validation" do
@@ -54,5 +54,20 @@ describe MonsterCatcher::Models::Monsters::Monster do
     
     specify { expect(instance).to have_accessor(:types).with(attributes[:types]) }
     specify { expect(instance).to have_mutator(:types).with(types) }
+  end # describe
+  
+  describe 'belongs to trainer' do
+    let :trainer_class do
+      Class.new do
+        include Mongoid::Document
+        
+        has_many :monsters, :as => :mock_trainer,
+          :class_name => "MonsterCatcher::Models::Monsters::Monster"
+      end # class
+    end # let
+    let :trainer do trainer_class.new; end
+    
+    specify { expect(instance).to have_accessor(:trainer).with(nil) }
+    specify { expect(instance).to have_mutator(:trainer).with(trainer) }
   end # describe
 end # describe

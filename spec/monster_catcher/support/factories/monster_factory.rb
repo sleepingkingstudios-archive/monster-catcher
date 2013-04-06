@@ -12,10 +12,11 @@ FactoryGirl.define do
     types []
     level 50
     
-    hit_points       { species.hit_points       * level / 100 }
-    physical_attack  { species.physical_attack  * level / 100 }
-    physical_defense { species.physical_defense * level / 100 }
-    special_attack   { species.special_attack   * level / 100 }
-    special_defense  { species.special_defense  * level / 100 }
+    hit_points       { species.hit_points       * (50 + 2 * level) }
+    physical_attack  { species.physical_attack  * (50 + 2 * level) }
+    physical_defense { species.physical_defense * (50 + 2 * level) }
+    special_attack   { species.special_attack   * (50 + 2 * level) }
+    special_defense  { species.special_defense  * (50 + 2 * level) }
+    speed            { species.speed            * (50 + 2 * level) }
   end # factory
 end # define

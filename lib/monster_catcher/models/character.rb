@@ -3,6 +3,7 @@
 require 'monster_catcher/models'
 require 'monster_catcher/models/explore/node'
 require 'monster_catcher/models/explore/region'
+require 'monster_catcher/models/monsters/monster'
 require 'monster_catcher/models/user'
 
 module MonsterCatcher::Models
@@ -14,6 +15,8 @@ module MonsterCatcher::Models
     
     # Relations
     belongs_to :user, :class_name => "MonsterCatcher::Models::User"
+    has_many :monsters, :as => :trainer,
+      :class_name => "MonsterCatcher::Models::Monsters::Monster"
     
     # Validations
     validates_presence_of :name
