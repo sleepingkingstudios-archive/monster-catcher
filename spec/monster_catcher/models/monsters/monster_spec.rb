@@ -7,10 +7,32 @@ require 'monster_catcher/models/monsters/monster'
 describe MonsterCatcher::Models::Monsters::Monster do
   specify { expect(described_class).to construct.with(0..1).arguments }
   
+  def self.has_attribute attribute_key
+    specify { expect(instance).to have_accessor :"#{attribute_key}" }
+    specify { expect(instance).to have_accessor :"base_#{attribute_key}" }
+    specify { expect(instance).to have_mutator  :"base_#{attribute_key}" }
+  end # class method has_attribute
+  
   def self.fields
-    [ :level, :hit_points, :physical_attack, :physical_defense,
-      :special_attack, :special_defense, :speed ]
+    [ :hit_points, :physical_attack, :physical_defense, :special_attack,
+      :special_defense, :speed ]
   end # class method fields
+  
+  describe "Monster.attribute" do
+    def self.attribute_key; :perspicacity; end
+    
+    let :described_class do Class.new super(); end
+    let :attribute_key   do self.class.attribute_key; end
+    
+    specify { expect(described_class).to respond_to(:attribute).with(1).arguments }
+    specify { expect { described_class.attribute attribute_key }.not_to raise_error }
+    
+    context 'with an attribute defined' do
+      before :each do described_class.attribute attribute_key; end
+      
+      has_attribute attribute_key
+    end # context
+  end # describe
   
   describe "validation" do
     specify { expect(described_class.new attributes).to be_valid }
@@ -30,6 +52,10 @@ describe MonsterCatcher::Models::Monsters::Monster do
   end # let
   let :instance do described_class.new attributes; end
   
+  fields.each do |attribute_key|
+    has_attribute attribute_key
+  end # each
+  
   describe :species do
     let :new_species do FactoryGirl.create :monster_species; end
     
@@ -37,10 +63,26 @@ describe MonsterCatcher::Models::Monsters::Monster do
     specify { expect(instance).to have_mutator(:species).with(new_species) }
   end # describe user
   
-  fields.each do |field|
-    specify { expect(instance).to have_accessor(field).with(attributes[field]) }
-    specify { expect(instance).to have_mutator(field).with(150) }
-  end # each
+  describe :techniques do
+    specify { expect(instance).to have_accessor(:technique_ids).with(nil) }
+    specify { expect(instance).to have_mutator(:technique_ids).with([]) }
+    
+    specify { expect(instance).to respond_to(:techniques).with(0).arguments }
+    specify { expect(instance.techniques).to be_a Array }
+    
+    context 'with techniques set' do
+      let :techniques do [*0..2].map { FactoryGirl.create :monster_technique }; end
+      
+      before :each do instance.technique_ids = techniques.map &:id; end
+      
+      specify { expect(instance.techniques).to be == techniques }
+    end # context
+  end # describe techniques
+  
+  describe :level do
+    specify { expect(instance).to have_accessor(:level).with(attributes[:level]) }
+    specify { expect(instance).to have_mutator(:level).with(50) }
+  end # describe
   
   describe :name do
     let :name do FactoryGirl.generate :monster_species_name; end
