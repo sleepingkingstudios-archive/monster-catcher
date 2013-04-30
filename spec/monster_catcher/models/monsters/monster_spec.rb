@@ -63,22 +63,6 @@ describe MonsterCatcher::Models::Monsters::Monster do
     specify { expect(instance).to have_mutator(:species).with(new_species) }
   end # describe user
   
-  describe :techniques do
-    specify { expect(instance).to have_accessor(:technique_ids).with(nil) }
-    specify { expect(instance).to have_mutator(:technique_ids).with([]) }
-    
-    specify { expect(instance).to respond_to(:techniques).with(0).arguments }
-    specify { expect(instance.techniques).to be_a Array }
-    
-    context 'with techniques set' do
-      let :techniques do [*0..2].map { FactoryGirl.create :monster_technique }; end
-      
-      before :each do instance.technique_ids = techniques.map &:id; end
-      
-      specify { expect(instance.techniques).to be == techniques }
-    end # context
-  end # describe techniques
-  
   describe :level do
     specify { expect(instance).to have_accessor(:level).with(attributes[:level]) }
     specify { expect(instance).to have_mutator(:level).with(50) }
@@ -111,5 +95,30 @@ describe MonsterCatcher::Models::Monsters::Monster do
     
     specify { expect(instance).to have_accessor(:trainer).with(nil) }
     specify { expect(instance).to have_mutator(:trainer).with(trainer) }
+  end # describe
+  
+  describe 'embeds many monster techniques' do
+    let :techniques do [*0..2].map { FactoryGirl.create :monster_technique }; end
+    let :monster_techniques do techniques.map { |technique|
+      MonsterCatcher::Models::Monsters::MonsterTechnique.new({ :technique => technique })
+    }; end # let
+    
+    specify { expect(instance).to have_accessor(:monster_techniques).with([]) }
+    specify { expect(instance).to have_mutator(:monster_techniques=).with(monster_techniques) }
+    
+    specify { expect(instance).to have_accessor(:techniques).with([]) }
+    specify { expect(instance).to have_mutator(:techniques=).with(techniques) }
+    
+    context 'with techniques indirectly set' do
+      before :each do instance.monster_techniques = monster_techniques; end
+      
+      specify { expect(instance.techniques).to be == techniques }
+      
+      specify 'sets the monster in the join model' do
+        monster_techniques.each do |monster_technique|
+          expect(monster_technique.monster).to be == instance
+        end # each
+      end # specify
+    end # context
   end # describe
 end # describe

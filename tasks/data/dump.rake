@@ -11,5 +11,6 @@ namespace :data do
     Explore::Node.destroy_all
     
     Monsters::Species.destroy_all
+    Monsters::Technique.destroy_all
   end # task
 end # namespace

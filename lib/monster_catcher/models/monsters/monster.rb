@@ -1,6 +1,7 @@
 # lib/monster_catcher/models/monsters/monster.rb
 
 require 'monster_catcher/models/monsters'
+require 'monster_catcher/models/monsters/monster_technique'
 require 'monster_catcher/models/monsters/species'
 require 'monster_catcher/models/monsters/technique'
 
@@ -40,9 +41,9 @@ module MonsterCatcher::Models::Monsters
     attribute :special_defense
     attribute :speed
     
-    field :technique_ids, :type => Array
-    
     #=# Relations #=#
+    embeds_many :monster_techniques, :class_name => "MonsterCatcher::Models::Monsters::MonsterTechnique"
+    
     belongs_to :species, :class_name => "MonsterCatcher::Models::Monsters::Species"
     belongs_to :trainer, :polymorphic => true
     
@@ -50,9 +51,16 @@ module MonsterCatcher::Models::Monsters
     validates :species, :presence => true
     
     def techniques
-      return [] if self.technique_ids.nil? || !self.technique_ids.respond_to?(:map)
+      return [] if self.monster_techniques.nil? || self.monster_techniques.empty?
       
-      Technique.where(:_id.in => self.technique_ids).to_a
+      Technique.where(:_id.in => self.monster_techniques.map(&:technique_id)).to_a
+    end # pseudo-relation techniques
+    
+    def techniques= techniques
+      self.monster_techniques.destroy_all
+      self.monster_techniques = techniques.map do |technique|
+        MonsterCatcher::Models::Monsters::MonsterTechnique.new({ :technique => technique })
+      end # map
     end # pseudo-relation techniques
   end # class
 end # module

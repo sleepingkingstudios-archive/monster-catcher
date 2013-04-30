@@ -65,9 +65,16 @@ namespace :data do
     end # each
     
     # Load and deserialize species data
-    manifest["species"].each do |species, _|
+    manifest["monsters"]["species"].each do |species, _|
       if species =~ /.yml$/
-        Monsters::Species.create get_yaml root, 'species', species
+        Monsters::Species.create get_yaml root, 'monsters', 'species', species
+      end # if
+    end # each
+    
+    # Load and deserialize technique data
+    manifest["monsters"]["techniques"].each do |technique, _|
+      if technique =~ /.yml$/
+        Monsters::Technique.create get_yaml root, 'monsters', 'techniques', technique
       end # if
     end # each
   end # task load
